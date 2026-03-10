@@ -127,7 +127,7 @@ Window {
             }
         }
 
-        // === КОМПАС с градусной шкалой ===
+        // === КОМПАС с градусной шкалой (исправленный) ===
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -152,8 +152,8 @@ Window {
             Rectangle {
                 id: compassCircle
                 anchors.centerIn: parent
-                width: 300
-                height: 300
+                width: 180
+                height: 180
                 radius: width / 2
                 color: "#003366"
                 border.color: "#0099ff"
@@ -169,15 +169,22 @@ Window {
                     Repeater {
                         model: 360
                         Rectangle {
-                            // Основные деления каждые 10°
-                            width: (index % 10 === 0) ? 3 : 1
-                            height: (index % 10 === 0) ? 25 : (index % 5 === 0 ? 18 : 10)
-                            color: (index % 10 === 0) ? "white" : "#aaaaaa"
+                            property bool isMain: index % 10 === 0
+                            property bool isMedium: index % 5 === 0
+
+                            width: isMain ? 3 : 1
+                            height: isMain ? 25 : (isMedium ? 18 : 10)
+                            color: isMain ? "white" : "#aaaaaa"
+
+                            // Поворот деления
                             rotation: index
-                            x: parent.width/2 - width/2
-                            y: (index % 10 === 0) ? 10 : (index % 5 === 0 ? 15 : 20)
-                            transformOrigin: Item.Bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            transformOrigin: Item.Center
+
+                            // Позиция по кругу (тригонометрия)
+                            property real radius: compassCircle.width / 2 - 15
+                            property real angleRad: (index - 90) * Math.PI / 180
+                            x: compassCircle.width/2 - width/2 + radius * Math.cos(angleRad)
+                            y: compassCircle.height/2 - height/2 + radius * Math.sin(angleRad)
                         }
                     }
 
@@ -190,13 +197,10 @@ Window {
                             font.pixelSize: 14
                             font.bold: true
 
-                            // Позиционируем по кругу
-                            property real angle: index * 30
-                            property real radius: compassCircle.width/2 - 55
-                            property real rad: (angle - 90) * Math.PI / 180
-
-                            x: compassCircle.width/2 + radius * Math.cos(rad) - width/2
-                            y: compassCircle.height/2 + radius * Math.sin(rad) - height/2
+                            property real radius: compassCircle.width/2 - 50
+                            property real angleRad: (index * 30 - 90) * Math.PI / 180
+                            x: compassCircle.width/2 + radius * Math.cos(angleRad) - width/2
+                            y: compassCircle.height/2 + radius * Math.sin(angleRad) - height/2
 
                             anchors.horizontalCenter: index * 30 === 0 || index * 30 === 180 ? parent.horizontalCenter : undefined
                         }
@@ -208,7 +212,7 @@ Window {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.topMargin: 35
                         text: "N"
-                        color: "red"
+                        color: "blue"
                         font.bold: true
                         font.pixelSize: 18
                         z: 10
@@ -244,9 +248,9 @@ Window {
                         z: 10
                     }
 
-                    // === Промежуточные стороны света (NE, SE, SW, NW) ===
+                    // === Промежуточные стороны (NE, SE, SW, NW) ===
                     Text {
-                        property real radius: compassCircle.width/2 - 55
+                        property real radius: compassCircle.width/2 - 50
                         property real rad: 45 * Math.PI / 180
                         x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
                         y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
@@ -257,7 +261,7 @@ Window {
                         z: 10
                     }
                     Text {
-                        property real radius: compassCircle.width/2 - 55
+                        property real radius: compassCircle.width/2 - 50
                         property real rad: 135 * Math.PI / 180
                         x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
                         y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
@@ -268,7 +272,7 @@ Window {
                         z: 10
                     }
                     Text {
-                        property real radius: compassCircle.width/2 - 55
+                        property real radius: compassCircle.width/2 - 50
                         property real rad: 225 * Math.PI / 180
                         x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
                         y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
@@ -279,7 +283,7 @@ Window {
                         z: 10
                     }
                     Text {
-                        property real radius: compassCircle.width/2 - 55
+                        property real radius: compassCircle.width/2 - 50
                         property real rad: 315 * Math.PI / 180
                         x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
                         y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
