@@ -71,3 +71,11 @@ Thumbs.db
 *.dll
 *.exe
 
+*.pro.user
+*.qmlc
+*.jsc
+Makefile
+*.o
+build-*/
+.qmake.stash
+
