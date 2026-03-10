@@ -127,7 +127,7 @@ Window {
             }
         }
 
-        // === КОМПАС ===
+        // === КОМПАС с градусной шкалой ===
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -152,12 +152,12 @@ Window {
             Rectangle {
                 id: compassCircle
                 anchors.centerIn: parent
-                width: 180
-                height: 180
+                width: 300
+                height: 300
                 radius: width / 2
                 color: "#003366"
                 border.color: "#0099ff"
-                border.width: 2
+                border.width: 3
                 clip: true
 
                 // Вращающийся диск с делениями
@@ -165,36 +165,136 @@ Window {
                     anchors.fill: parent
                     rotation: -compassHeading
 
+                    // === ГРАДУСНАЯ ШКАЛА (360 делений) ===
                     Repeater {
-                        model: 36
+                        model: 360
                         Rectangle {
-                            width: (index % 9 === 0) ? 3 : 1
-                            height: (index % 9 === 0) ? 20 : 10
-                            color: (index % 9 === 0) ? "white" : "#888888"
-                            rotation: index * 10
+                            // Основные деления каждые 10°
+                            width: (index % 10 === 0) ? 3 : 1
+                            height: (index % 10 === 0) ? 25 : (index % 5 === 0 ? 18 : 10)
+                            color: (index % 10 === 0) ? "white" : "#aaaaaa"
+                            rotation: index
                             x: parent.width/2 - width/2
-                            y: (index % 9 === 0) ? 10 : 15
+                            y: (index % 10 === 0) ? 10 : (index % 5 === 0 ? 15 : 20)
                             transformOrigin: Item.Bottom
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
 
-                    // N на диске
+                    // === ЦИФРЫ (каждые 30°) ===
+                    Repeater {
+                        model: 12
+                        Text {
+                            text: (index * 30 === 0) ? "" : (index * 30)
+                            color: "#00ffff"
+                            font.pixelSize: 14
+                            font.bold: true
+
+                            // Позиционируем по кругу
+                            property real angle: index * 30
+                            property real radius: compassCircle.width/2 - 55
+                            property real rad: (angle - 90) * Math.PI / 180
+
+                            x: compassCircle.width/2 + radius * Math.cos(rad) - width/2
+                            y: compassCircle.height/2 + radius * Math.sin(rad) - height/2
+
+                            anchors.horizontalCenter: index * 30 === 0 || index * 30 === 180 ? parent.horizontalCenter : undefined
+                        }
+                    }
+
+                    // === СТОРОНЫ СВЕТА ===
                     Text {
                         anchors.top: parent.top
                         anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.topMargin: 5
+                        anchors.topMargin: 35
                         text: "N"
                         color: "red"
                         font.bold: true
-                        font.pixelSize: 14
+                        font.pixelSize: 18
+                        z: 10
+                    }
+                    Text {
+                        anchors.bottom: parent.bottom
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottomMargin: 35
+                        text: "S"
+                        color: "white"
+                        font.bold: true
+                        font.pixelSize: 18
+                        z: 10
+                    }
+                    Text {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: 35
+                        text: "W"
+                        color: "white"
+                        font.bold: true
+                        font.pixelSize: 18
+                        z: 10
+                    }
+                    Text {
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.rightMargin: 35
+                        text: "E"
+                        color: "white"
+                        font.bold: true
+                        font.pixelSize: 18
+                        z: 10
+                    }
+
+                    // === Промежуточные стороны света (NE, SE, SW, NW) ===
+                    Text {
+                        property real radius: compassCircle.width/2 - 55
+                        property real rad: 45 * Math.PI / 180
+                        x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
+                        y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
+                        text: "NE"
+                        color: "#888888"
+                        font.pixelSize: 12
+                        font.bold: true
+                        z: 10
+                    }
+                    Text {
+                        property real radius: compassCircle.width/2 - 55
+                        property real rad: 135 * Math.PI / 180
+                        x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
+                        y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
+                        text: "SE"
+                        color: "#888888"
+                        font.pixelSize: 12
+                        font.bold: true
+                        z: 10
+                    }
+                    Text {
+                        property real radius: compassCircle.width/2 - 55
+                        property real rad: 225 * Math.PI / 180
+                        x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
+                        y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
+                        text: "SW"
+                        color: "#888888"
+                        font.pixelSize: 12
+                        font.bold: true
+                        z: 10
+                    }
+                    Text {
+                        property real radius: compassCircle.width/2 - 55
+                        property real rad: 315 * Math.PI / 180
+                        x: compassCircle.width/2 + radius * Math.cos(rad - Math.PI/2) - width/2
+                        y: compassCircle.height/2 + radius * Math.sin(rad - Math.PI/2) - height/2
+                        text: "NW"
+                        color: "#888888"
+                        font.pixelSize: 12
+                        font.bold: true
+                        z: 10
                     }
                 }
 
-                // Стрелка (указывает вверх)
+                // === Стрелка (неподвижная, указывает вверх) ===
                 Rectangle {
                     anchors.centerIn: parent
-                    width: 4
+                    width: 5
                     height: parent.height * 0.35
                     color: "red"
                     radius: 2
@@ -204,17 +304,17 @@ Window {
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.top
-                        width: 10
-                        height: 12
+                        width: 12
+                        height: 15
                         color: "red"
-                        radius: 5
+                        radius: 6
                     }
                 }
 
-                // Южная часть
+                // Южная часть стрелки
                 Rectangle {
                     anchors.centerIn: parent
-                    width: 4
+                    width: 5
                     height: parent.height * 0.15
                     color: "white"
                     radius: 2
@@ -225,55 +325,13 @@ Window {
                 // Центр
                 Rectangle {
                     anchors.centerIn: parent
-                    width: 16
-                    height: 16
-                    radius: 8
+                    width: 18
+                    height: 18
+                    radius: 9
                     color: "#cccccc"
                     border.color: "#666666"
                     border.width: 2
                     z: 100
-                }
-
-                // Стороны света (внутри круга)
-                Text {
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.topMargin: 8
-                    text: "N"
-                    color: "#00ff00"
-                    font.bold: true
-                    font.pixelSize: 16
-                    z: 50
-                }
-                Text {
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottomMargin: 8
-                    text: "S"
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: 16
-                    z: 50
-                }
-                Text {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: 8
-                    text: "W"
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: 16
-                    z: 50
-                }
-                Text {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.rightMargin: 8
-                    text: "E"
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: 16
-                    z: 50
                 }
             }
 
@@ -288,5 +346,7 @@ Window {
                 font.bold: true
             }
         }
+
+
     }
 }
