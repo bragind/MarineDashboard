@@ -79,3 +79,15 @@ Makefile
 build-*/
 .qmake.stash
 
+# Build artifacts
+.qmake.stash
+Makefile*
+deployment.pri
+*.o *.obj *.exe *.dll *.so
+*.pdb *.ilk *.exp
+
+# Build directories (out-of-source)
+build/
+build-*/
+debug/
+release/
